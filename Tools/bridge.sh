@@ -6,7 +6,7 @@
 #   Tools/bridge.sh go /direct/inbox/            sayfaya gider
 #   Tools/bridge.sh shot [dosya.png]             ekran görüntüsü alır (yalnız simülatör)
 #
-# SIM_DEVICE (varsayılan: booted) ve INSTALITE_BUNDLE ile hedef değiştirilir.
+# SIM_DEVICE (varsayılan: booted) ve INSTALITE_BUNDLE ile hedef, BRIDGE_TIMEOUT (sn) ile bekleme değiştirilir.
 set -eu
 
 SIM=${SIM_DEVICE:-booted}
@@ -41,10 +41,9 @@ run_js() {
   id="$$-$(date +%s)"
   printf 'return JSON.stringify({id: "%s", value: await (async () => {\n%s\n})()});\n' "$id" "$1" > "$WORK/cmd.js"
   send "$WORK/cmd.js"
-  tries=0
+  deadline=$(($(date +%s) + ${BRIDGE_TIMEOUT:-30}))
   while ! { fetch "$WORK/out.json" && grep -q "$id" "$WORK/out.json"; }; do
-    tries=$((tries + 1))
-    if [ "$tries" -gt 60 ]; then
+    if [ "$(date +%s)" -gt "$deadline" ]; then
       echo "zaman aşımı: uygulama açık ve Debug sürümü mü?" >&2
       exit 1
     fi

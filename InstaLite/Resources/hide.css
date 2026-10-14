@@ -1,13 +1,9 @@
 /* Sayfa çizilmeden önce eklenir. Seçiciler Instagram'ın mobil web sürümüne bağlıdır;
    site değişirse burası bakım ister. Kırılırsa adres engeli (blocker.js) korumaya devam eder. */
 
-/* Reels sekmesi ve profillerdeki Reels sekmesi. Keşfet bağlantısı kalır: blocker.js onu aramaya yönlendirir. */
+/* Reels sekmesi ve profillerdeki Reels sekmesi. Keşfet bağlantısı kalır: blocker.js onu aramaya yönlendirir.
+   Akıştaki Reels gönderileri burada gizlenmez: feed-filter.js onları veriden çıkarır (nedeni orada). */
 a[href$="/reels/"] {
-  display: none !important;
-}
-
-/* Ana akıştaki Reels gönderileri (takip edilenlerinki dahil). */
-html.instalite-home article:has(a[href*="/reel/"]) {
   display: none !important;
 }
 

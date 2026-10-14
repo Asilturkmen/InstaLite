@@ -1,10 +1,10 @@
 // İmza ayarları. Kendi Apple hesabınla kurmak için yanına Local.xcconfig oluştur (git'e girmez):
 //
 //   DEVELOPMENT_TEAM = <Team ID>
-//   PRODUCT_BUNDLE_IDENTIFIER = com.<adın>.instalite
+//   INSTALITE_BUNDLE_ID = com.<adın>.instalite
 //
 // Team ID: Xcode → Settings → Accounts, ya da Apple Development sertifikasının OU alanı.
 
-PRODUCT_BUNDLE_IDENTIFIER = com.asilturkmen.instalite
+INSTALITE_BUNDLE_ID = com.asilturkmen.instalite
 
 #include? "Local.xcconfig"

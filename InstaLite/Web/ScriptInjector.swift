@@ -5,6 +5,7 @@ import WebKit
 enum ScriptInjector {
     static func install(into controller: WKUserContentController) {
         // Sayfa ile aynı JS dünyasında çalışmalı: history.pushState'i sarmak için sayfanın kendi nesnesi gerekir.
+        add(resource("feed-filter", "js"), to: controller)
         add(resource("rules", "js") + "\n" + resource("blocker", "js"), to: controller)
         add(styleScript(css: resource("hide", "css")), to: controller)
         add(resource("page", "js"), to: controller)

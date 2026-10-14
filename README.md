@@ -20,11 +20,11 @@ open InstaLite.xcodeproj
 
 ```
 DEVELOPMENT_TEAM = <Team ID>
-PRODUCT_BUNDLE_IDENTIFIER = com.<adın>.instalite
+INSTALITE_BUNDLE_ID = com.<adın>.instalite
 ```
 
 Team ID, Xcode → Settings → Accounts'ta görünür. Uygulama kimlikleri Apple hesapları arasında
-benzersiz olmalı, o yüzden kendine özgü bir `PRODUCT_BUNDLE_IDENTIFIER` seç.
+benzersiz olmalı, o yüzden kendine özgü bir `INSTALITE_BUNDLE_ID` seç.
 iPhone'da Ayarlar → Gizlilik ve Güvenlik → Geliştirici Modu açık olmalı. Ücretsiz hesapta imza
 7 gün geçerlidir; süre dolunca Xcode'dan yeniden Run.
 
