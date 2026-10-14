@@ -3,6 +3,11 @@
 Reels'siz Instagram: instagram.com'u uygulama içi web görünümünde açan kişisel iOS uygulaması.
 Analitik, sunucu ya da dış istek yok.
 
+> **Not:** Bu proje Meta Platforms, Inc. ya da Instagram ile bağlantılı değildir; onlar tarafından
+> desteklenmez veya onaylanmaz. "Instagram" Meta'nın tescilli markasıdır. InstaLite kişisel kullanım
+> için yazılmış bir açık kaynak projesidir; App Store'da dağıtılmaz. Kullanırken Instagram'ın
+> kullanım koşulları geçerlidir.
+
 ## Kurulum
 
 ```sh
@@ -12,6 +17,9 @@ open InstaLite.xcodeproj
 ```
 
 Xcode'da InstaLite hedefi → Signing & Capabilities → Team olarak kişisel Apple hesabını seç.
+Kendi kopyanı kuruyorsan `project.yml`'deki `PRODUCT_BUNDLE_IDENTIFIER`'ı kendine özgü bir değerle
+değiştir (ör. `com.<adın>.instalite`) ve `xcodegen generate`'i yeniden çalıştır; uygulama kimlikleri
+Apple hesapları arasında benzersiz olmalı.
 iPhone'da Ayarlar → Gizlilik ve Güvenlik → Geliştirici Modu açık olmalı. Ücretsiz hesapta imza
 7 gün geçerlidir; süre dolunca Xcode'dan yeniden Run.
 
@@ -33,3 +41,7 @@ xcodebuild test -scheme InstaLite \
 ```
 
 İki taraf da `Tests/rules-cases.json` vakalarını kullanır; bir kuralı değiştirirken ikisini birlikte değiştir.
+
+## Lisans
+
+[MIT](LICENSE)
