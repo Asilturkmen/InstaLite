@@ -11,7 +11,13 @@ html.instalite-home article:has(a[href*="/reel/"]) {
   display: none !important;
 }
 
-/* "Uygulamada aç" / "Uygulamayı indir" bant ve bağlantıları. */
+/* Instagram'ın web alt çubuğu; yerini uygulamanın kendi sekme çubuğu alır (tabs.js işaretler). */
+[data-instalite-webnav] {
+  display: none !important;
+}
+
+/* "Uygulamada aç" / "Uygulamayı kullan" / "Uygulamayı indir" bant ve bağlantıları. */
+._acc8._abpk,
 a[href*="apps.apple.com"],
 a[href*="itunes.apple.com"],
 a[href^="itms"],

@@ -8,6 +8,7 @@ enum ScriptInjector {
         add(resource("rules", "js") + "\n" + resource("blocker", "js"), to: controller)
         add(styleScript(css: resource("hide", "css")), to: controller)
         add(resource("page", "js"), to: controller)
+        add(resource("tabs", "js"), to: controller)
     }
 
     private static func add(_ source: String, to controller: WKUserContentController) {

@@ -2,17 +2,23 @@ import Network
 import UIKit
 import WebKit
 
-/// Instagram'ın mobil web sürümünü tam ekran gösterir. Uygulamanın kendi düğmesi ya da
-/// çubuğu yoktur; geri gitmek için kenardan kaydırılır, yenilemek için aşağı çekilir.
+/// Instagram'ın mobil web sürümünü tam ekran gösterir. Web'in alt çubuğunun yerinde yerel sekme
+/// çubuğu durur; geri gitmek için kenardan kaydırılır, yenilemek için aşağı çekilir.
 final class WebViewController: UIViewController {
     private static let home = URL(string: "https://www.instagram.com/")!
 
     private let webView: WKWebView
+    private let tabBar = NativeTabBar()
     private let launchCover = UIView()
     private let offlineView = OfflineView()
     private let refreshControl = UIRefreshControl()
     private let pathMonitor = NWPathMonitor()
     private var failedURL: URL?
+    private var webViewAboveTabBar: NSLayoutConstraint!
+    private var webViewAboveSafeArea: NSLayoutConstraint!
+    #if DEBUG
+    private var debugBridge: DebugBridge?
+    #endif
 
     init() {
         let configuration = WKWebViewConfiguration()
@@ -20,7 +26,15 @@ final class WebViewController: UIViewController {
         configuration.allowsInlineMediaPlayback = true
         configuration.mediaTypesRequiringUserActionForPlayback = []
         configuration.applicationNameForUserAgent = Self.safariApplicationName
-        ScriptInjector.install(into: configuration.userContentController)
+        #if DEBUG
+        // Karşılaştırma için: `-InstaLiteNoInject YES` ile başlatılınca betik ve stil eklenmez.
+        let inject = !UserDefaults.standard.bool(forKey: "InstaLiteNoInject")
+        #else
+        let inject = true
+        #endif
+        if inject {
+            ScriptInjector.install(into: configuration.userContentController)
+        }
         webView = WKWebView(frame: .zero, configuration: configuration)
         super.init(nibName: nil, bundle: nil)
     }
@@ -56,7 +70,14 @@ final class WebViewController: UIViewController {
         webView.removeInputAccessoryView()
         #if DEBUG
         webView.isInspectable = true
+        debugBridge = DebugBridge(webView: webView)
         #endif
+
+        webView.configuration.userContentController.add(ScriptMessageProxy(target: self), name: "instalite")
+        tabBar.isHidden = true
+        tabBar.onSelect = { [weak self] tab in
+            self?.webView.evaluateJavaScript("globalThis.__instaLiteTabs && __instaLiteTabs.open('\(tab.name)')")
+        }
 
         refreshControl.addTarget(self, action: #selector(pullToRefresh), for: .valueChanged)
         webView.scrollView.refreshControl = refreshControl
@@ -65,16 +86,21 @@ final class WebViewController: UIViewController {
         offlineView.onRetry = { [weak self] in self?.retry() }
         launchCover.backgroundColor = background
 
-        for subview in [webView, offlineView, launchCover] {
+        for subview in [webView, tabBar, offlineView, launchCover] {
             subview.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview(subview)
         }
         let safeArea = view.safeAreaLayoutGuide
+        webViewAboveTabBar = webView.bottomAnchor.constraint(equalTo: tabBar.topAnchor)
+        webViewAboveSafeArea = webView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor)
         NSLayoutConstraint.activate([
             webView.topAnchor.constraint(equalTo: safeArea.topAnchor),
-            webView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor),
+            webViewAboveSafeArea,
             webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tabBar.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            tabBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tabBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
         ])
         for cover in [offlineView, launchCover] {
             NSLayoutConstraint.activate([
@@ -92,6 +118,15 @@ final class WebViewController: UIViewController {
         pathMonitor.start(queue: DispatchQueue(label: "InstaLite.network"))
 
         webView.load(URLRequest(url: Self.home))
+    }
+
+    private func show(_ route: NativeTabBar.Route) {
+        tabBar.update(with: route)
+        let visible = NativeTabBar.isVisible(on: route)
+        guard tabBar.isHidden == visible else { return }
+        tabBar.isHidden = !visible
+        webViewAboveSafeArea.isActive = !visible
+        webViewAboveTabBar.isActive = visible
     }
 
     @objc private func pullToRefresh() {
@@ -175,6 +210,35 @@ extension WebViewController: WKNavigationDelegate {
 
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         webView.reload()
+    }
+}
+
+extension WebViewController: WKScriptMessageHandler {
+    /// `tabs.js` her sayfa değişiminde yolu, oturum durumunu ve profil bilgisini bildirir.
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard message.frameInfo.isMainFrame,
+              let body = message.body as? [String: Any],
+              let path = body["path"] as? String
+        else { return }
+        show(NativeTabBar.Route(
+            path: path,
+            loggedIn: body["loggedIn"] as? Bool ?? false,
+            profile: body["profile"] as? String,
+            avatar: (body["avatar"] as? String).flatMap(URL.init(string:))
+        ))
+    }
+}
+
+/// `WKUserContentController` ileti alıcısını güçlü tutar; denetleyiciyle döngü olmasın diye zayıf aracı.
+private final class ScriptMessageProxy: NSObject, WKScriptMessageHandler {
+    private weak var target: WKScriptMessageHandler?
+
+    init(target: WKScriptMessageHandler) {
+        self.target = target
+    }
+
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        target?.userContentController(userContentController, didReceive: message)
     }
 }
 
