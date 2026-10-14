@@ -42,9 +42,11 @@ targets:
         # Instagram web'de fotoğraf/video yüklerken dosya seçici kamerayı da sunar.
         NSCameraUsageDescription: Gönderi ve hikâye için fotoğraf ya da video çekmek.
         NSMicrophoneUsageDescription: Video çekerken ses kaydetmek.
+    configFiles:
+      Debug: Config/Signing.xcconfig
+      Release: Config/Signing.xcconfig
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.asilturkmen.instalite
         TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
 

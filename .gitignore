@@ -6,3 +6,6 @@ DerivedData/
 xcuserdata/
 *.xcuserstate
 .DS_Store
+
+# Kişisel imza ayarları (Team ID vb.)
+Config/Local.xcconfig

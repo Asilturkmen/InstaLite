@@ -16,10 +16,15 @@ xcodegen generate          # InstaLite.xcodeproj'u project.yml'den üretir (git'
 open InstaLite.xcodeproj
 ```
 
-Xcode'da InstaLite hedefi → Signing & Capabilities → Team olarak kişisel Apple hesabını seç.
-Kendi kopyanı kuruyorsan `project.yml`'deki `PRODUCT_BUNDLE_IDENTIFIER`'ı kendine özgü bir değerle
-değiştir (ör. `com.<adın>.instalite`) ve `xcodegen generate`'i yeniden çalıştır; uygulama kimlikleri
-Apple hesapları arasında benzersiz olmalı.
+İmza için `Config/Local.xcconfig` oluştur (git'e girmez):
+
+```
+DEVELOPMENT_TEAM = <Team ID>
+PRODUCT_BUNDLE_IDENTIFIER = com.<adın>.instalite
+```
+
+Team ID, Xcode → Settings → Accounts'ta görünür. Uygulama kimlikleri Apple hesapları arasında
+benzersiz olmalı, o yüzden kendine özgü bir `PRODUCT_BUNDLE_IDENTIFIER` seç.
 iPhone'da Ayarlar → Gizlilik ve Güvenlik → Geliştirici Modu açık olmalı. Ücretsiz hesapta imza
 7 gün geçerlidir; süre dolunca Xcode'dan yeniden Run.
 
