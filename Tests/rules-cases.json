@@ -1,0 +1,48 @@
+{
+  "redirect": [
+    { "from": null, "to": "/", "expected": null },
+    { "from": "/", "to": "/p/ABC123/", "expected": null },
+    { "from": "/", "to": "/natgeo/", "expected": null },
+    { "from": "/", "to": "/natgeo/tagged/", "expected": null },
+    { "from": "/", "to": "/direct/inbox/", "expected": null },
+    { "from": "/", "to": "/stories/natgeo/3456/", "expected": null },
+    { "from": "/", "to": "/accounts/login/", "expected": null },
+
+    { "from": "/", "to": "/reels/", "expected": "/" },
+    { "from": "/", "to": "/reels", "expected": "/" },
+    { "from": "/", "to": "/reels/C9xyz/", "expected": "/" },
+    { "from": null, "to": "/reels/", "expected": "/" },
+    { "from": "/natgeo/", "to": "/natgeo/reels/", "expected": "/" },
+    { "from": "/natgeo/", "to": "/natgeo/reels", "expected": "/" },
+
+    { "from": "/", "to": "/explore/", "expected": "/explore/search/" },
+    { "from": "/", "to": "/explore", "expected": "/explore/search/" },
+    { "from": "/", "to": "/explore/search/", "expected": null },
+    { "from": "/", "to": "/explore/search/keyword/", "expected": null },
+    { "from": "/", "to": "/explore/tags/cats/", "expected": "/" },
+    { "from": "/", "to": "/explore/locations/123/istanbul/", "expected": "/" },
+
+    { "from": "/direct/t/1234/", "to": "/reel/AAA/", "expected": null },
+    { "from": null, "to": "/reel/AAA/", "expected": null },
+    { "from": "/reel/AAA/", "to": "/reel/AAA/", "expected": null },
+    { "from": "/reel/AAA/", "to": "/reel/AAA/comments/", "expected": null },
+    { "from": "/reel/AAA/", "to": "/direct/t/1234/", "expected": null },
+    { "from": "/reel/AAA/", "to": "/reel/BBB/", "expected": "/" },
+    { "from": "/reel/AAA", "to": "/reel/BBB", "expected": "/" },
+    { "from": "/reel/AAA/", "to": "/natgeo/reel/BBB/", "expected": "/" },
+    { "from": "/natgeo/reel/AAA/", "to": "/reel/BBB/", "expected": "/" }
+  ],
+  "external": [
+    { "url": "https://www.instagram.com/", "expected": null },
+    { "url": "https://instagram.com/p/ABC123/", "expected": null },
+    { "url": "https://accountscenter.instagram.com/", "expected": null },
+    { "url": "https://l.instagram.com/?u=https%3A%2F%2Fexample.com%2Fpage%3Fa%3D1&e=AT0abc", "expected": "https://example.com/page?a=1" },
+    { "url": "https://l.instagram.com/", "expected": "https://l.instagram.com/" },
+    { "url": "https://example.com/", "expected": "https://example.com/" },
+    { "url": "https://notinstagram.com/", "expected": "https://notinstagram.com/" },
+    { "url": "https://instagram.com.evil.example/", "expected": "https://instagram.com.evil.example/" },
+    { "url": "mailto:someone@example.com", "expected": "mailto:someone@example.com" },
+    { "url": "about:blank", "expected": null },
+    { "url": "blob:https://www.instagram.com/1234", "expected": null }
+  ]
+}

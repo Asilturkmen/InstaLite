@@ -1,0 +1,8 @@
+# XcodeGen ile üretilir: `xcodegen generate`
+*.xcodeproj/
+
+build/
+DerivedData/
+xcuserdata/
+*.xcuserstate
+.DS_Store

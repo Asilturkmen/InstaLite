@@ -1,0 +1,41 @@
+/* Sayfa çizilmeden önce eklenir. Seçiciler Instagram'ın mobil web sürümüne bağlıdır;
+   site değişirse burası bakım ister. Kırılırsa adres engeli (blocker.js) korumaya devam eder. */
+
+/* Reels sekmesi ve profillerdeki Reels sekmesi. Keşfet bağlantısı kalır: blocker.js onu aramaya yönlendirir. */
+a[href$="/reels/"] {
+  display: none !important;
+}
+
+/* Ana akıştaki Reels gönderileri (takip edilenlerinki dahil). */
+html.instalite-home article:has(a[href*="/reel/"]) {
+  display: none !important;
+}
+
+/* "Uygulamada aç" / "Uygulamayı indir" bant ve bağlantıları. */
+a[href*="apps.apple.com"],
+a[href*="itunes.apple.com"],
+a[href^="itms"],
+a[href^="instagram://"] {
+  display: none !important;
+}
+
+/* Web'i ele veren ipuçları: dokunma vurgusu, uzun basma menüsü, metin seçimi, çift dokunup yakınlaştırma. */
+html {
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+input,
+textarea,
+[contenteditable]:not([contenteditable="false"]),
+[contenteditable]:not([contenteditable="false"]) * {
+  -webkit-user-select: text;
+  user-select: text;
+}
