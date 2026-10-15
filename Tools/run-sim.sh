@@ -4,7 +4,7 @@
 set -eu
 cd "$(dirname "$0")/.."
 DEVICE=${SIM_DEVICE:-booted}
-BUNDLE=${INSTALITE_BUNDLE:-com.asilturkmen.instalite}
+BUNDLE=$("$(dirname "$0")/bundle-id.sh")
 xcodegen generate --quiet
 mkdir -p build
 if ! xcodebuild build -project InstaLite.xcodeproj -scheme InstaLite -destination 'generic/platform=iOS Simulator' \

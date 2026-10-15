@@ -38,8 +38,18 @@ enum BlockRules {
     }
 
     static func isInstagram(_ url: URL) -> Bool {
-        guard let host = url.host?.lowercased() else { return false }
+        isInstagramHost(url.host)
+    }
+
+    static func isInstagramHost(_ host: String?) -> Bool {
+        guard let host = host?.lowercased() else { return false }
         return host == "instagram.com" || host.hasSuffix(".instagram.com")
+    }
+
+    /// Profil fotoğrafı gibi uygulamanın kendisinin indirdiği resimler yalnız bu sunuculardan gelir.
+    static func isInstagramImage(_ url: URL) -> Bool {
+        guard url.scheme?.lowercased() == "https", let host = url.host?.lowercased() else { return false }
+        return ["cdninstagram.com", "fbcdn.net"].contains { host == $0 || host.hasSuffix("." + $0) }
     }
 
     private static func segments(_ path: String) -> [Substring] {

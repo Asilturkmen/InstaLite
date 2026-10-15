@@ -13,7 +13,7 @@
     return !!media && media.product_type === 'clips';
   }
 
-  // Çıkarılan Reels sayısı; geliştirme ölçümleri (debug.js) bunu raporlar.
+  // Çıkarılan Reels sayısı; geliştirme ölçümleri (DebugBridge) bunu raporlar.
   globalThis.__instaLiteRemovedReels = 0;
 
   function filterConnection(connection) {

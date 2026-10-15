@@ -164,11 +164,16 @@ final class WebViewController: UIViewController {
     }
 
     /// Engellenen adres sessizce yönlendirilir, dış bağlantı Safari'de açılır.
+    /// Web dışı adresler (instagram://, App Store, tel: …) başka uygulama açtığı için yalnız
+    /// kullanıcı dokunduysa açılır; sayfanın kendiliğinden yönlendirmesi sessizce iptal edilir.
     /// Dönen değer true ise yükleme uygulamada devam etmemeli.
-    private func route(_ request: URLRequest) -> Bool {
+    private func route(_ request: URLRequest, userInitiated: Bool) -> Bool {
         guard let url = request.url else { return false }
         if let external = BlockRules.externalURL(for: url) {
-            UIApplication.shared.open(external)
+            let web = ["http", "https"].contains(external.scheme?.lowercased())
+            if web || userInitiated {
+                UIApplication.shared.open(external)
+            }
             return true
         }
         if BlockRules.isInstagram(url), let target = BlockRules.redirect(from: webView.url?.path, to: url.path) {
@@ -190,7 +195,8 @@ extension WebViewController: WKNavigationDelegate {
             decisionHandler(.allow)
             return
         }
-        decisionHandler(route(navigationAction.request) ? .cancel : .allow)
+        let tapped = navigationAction.navigationType == .linkActivated
+        decisionHandler(route(navigationAction.request, userInitiated: tapped) ? .cancel : .allow)
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -217,14 +223,17 @@ extension WebViewController: WKScriptMessageHandler {
     /// `tabs.js` her sayfa değişiminde yolu, oturum durumunu ve profil bilgisini bildirir.
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard message.frameInfo.isMainFrame,
+              BlockRules.isInstagramHost(message.frameInfo.securityOrigin.host),
               let body = message.body as? [String: Any],
               let path = body["path"] as? String
         else { return }
+        // Uygulama bu adresi indirir; yalnız Instagram'ın resim sunucularına izin verilir.
+        let avatar = (body["avatar"] as? String).flatMap(URL.init(string:)).flatMap { BlockRules.isInstagramImage($0) ? $0 : nil }
         show(NativeTabBar.Route(
             path: path,
             loggedIn: body["loggedIn"] as? Bool ?? false,
             profile: body["profile"] as? String,
-            avatar: (body["avatar"] as? String).flatMap(URL.init(string:))
+            avatar: avatar
         ))
     }
 }
@@ -250,7 +259,8 @@ extension WebViewController: WKUIDelegate {
         for navigationAction: WKNavigationAction,
         windowFeatures: WKWindowFeatures
     ) -> WKWebView? {
-        if !route(navigationAction.request) {
+        // iOS'ta sayfa yeni pencereyi yalnız kullanıcı dokunuşuyla açabilir.
+        if !route(navigationAction.request, userInitiated: true) {
             webView.load(navigationAction.request)
         }
         return nil

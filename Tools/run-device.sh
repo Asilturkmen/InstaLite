@@ -4,7 +4,7 @@
 set -eu
 cd "$(dirname "$0")/.."
 PHONE=${INSTALITE_DEVICE:?INSTALITE_DEVICE=<UDID> ver (xcrun devicectl list devices)}
-BUNDLE=${INSTALITE_BUNDLE:-com.asilturkmen.instalite}
+BUNDLE=$("$(dirname "$0")/bundle-id.sh")
 CONFIG=${1:-Debug}
 xcodegen generate --quiet
 mkdir -p build

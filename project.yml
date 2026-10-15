@@ -86,4 +86,11 @@ schemes:
     test:
       targets:
         - InstaLiteTests
+  # Ağ ve açık Instagram oturumu ister; yalnız ölçüm için (Tools/uitest.sh).
+  InstaLiteMetrics:
+    build:
+      targets:
+        InstaLite: all
+    test:
+      targets:
         - InstaLiteUITests

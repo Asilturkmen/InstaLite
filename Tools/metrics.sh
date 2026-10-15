@@ -1,11 +1,11 @@
 #!/bin/sh
-# Geliştirme aracı: debug.js ölçümlerini (metrics.jsonl) alıp özetler.
+# Geliştirme aracı: DebugBridge ölçüm betiği ölçümlerini (metrics.jsonl) alıp özetler.
 #   Tools/metrics.sh             açık simülatör
 #   INSTALITE_DEVICE=<UDID> Tools/metrics.sh   kabloyla bağlı iPhone
 set -eu
 SIM=${SIM_DEVICE:-booted}
 PHONE=${INSTALITE_DEVICE:-}
-BUNDLE=${INSTALITE_BUNDLE:-com.asilturkmen.instalite}
+BUNDLE=$("$(dirname "$0")/bundle-id.sh")
 OUT=$(mktemp)
 trap 'rm -f "$OUT"' EXIT
 if [ -n "$PHONE" ]; then

@@ -6,12 +6,12 @@
 #   Tools/bridge.sh go /direct/inbox/            sayfaya gider
 #   Tools/bridge.sh shot [dosya.png]             ekran görüntüsü alır (yalnız simülatör)
 #
-# SIM_DEVICE (varsayılan: booted) ve INSTALITE_BUNDLE ile hedef, BRIDGE_TIMEOUT (sn) ile bekleme değiştirilir.
+# SIM_DEVICE (varsayılan: booted) ile hedef, BRIDGE_TIMEOUT (sn) ile bekleme değiştirilir.
 set -eu
 
 SIM=${SIM_DEVICE:-booted}
 PHONE=${INSTALITE_DEVICE:-}
-BUNDLE=${INSTALITE_BUNDLE:-com.asilturkmen.instalite}
+BUNDLE=$("$(dirname "$0")/bundle-id.sh")
 WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT
 
@@ -39,7 +39,7 @@ fetch() {
 
 run_js() {
   id="$$-$(date +%s)"
-  printf 'return JSON.stringify({id: "%s", value: await (async () => {\n%s\n})()});\n' "$id" "$1" > "$WORK/cmd.js"
+  printf 'return JSON.stringify({id: "%s", value: await (async () => {\n%s\n})()});\n// instalite:end\n' "$id" "$1" > "$WORK/cmd.js"
   send "$WORK/cmd.js"
   deadline=$(($(date +%s) + ${BRIDGE_TIMEOUT:-30}))
   while ! { fetch "$WORK/out.json" && grep -q "$id" "$WORK/out.json"; }; do

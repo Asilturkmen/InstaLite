@@ -17,6 +17,18 @@
     }
   }
 
+  function forget() {
+    account = null;
+    try {
+      localStorage.removeItem('instalite:account');
+    } catch {}
+  }
+
+  // Instagram oturum açıkken sayfanın okuyabildiği ds_user_id çerezini koyar; çıkışta siler.
+  function loggedIn() {
+    return /(^|; )ds_user_id=/.test(document.cookie) && !location.pathname.startsWith('/accounts/login');
+  }
+
   function remember(next) {
     if (account && account.profile === next.profile && account.avatar === next.avatar) return;
     account = next;
@@ -62,15 +74,17 @@
 
   function report() {
     findNav();
-    const profile = profileLink();
+    const signedIn = loggedIn();
+    const profile = signedIn && profileLink();
     if (profile) {
       const avatar = profile.querySelector('img');
       remember({ profile: profile.getAttribute('href'), avatar: avatar ? avatar.currentSrc || avatar.src : null });
+    } else if (!signedIn && account) {
+      forget();
     }
-    const loginPage = location.pathname.startsWith('/accounts/login');
     const message = {
       path: location.pathname,
-      loggedIn: !loginPage && !!(nav || account),
+      loggedIn: signedIn,
       profile: account ? account.profile : null,
       avatar: account ? account.avatar : null,
     };
@@ -80,14 +94,21 @@
     post(message);
   }
 
+  // Akış kaydırılırken DOM her karede değişir; rapor en fazla 300 ms'de bir hazırlanır.
   let scheduled = false;
   function scheduleReport() {
     if (scheduled) return;
     scheduled = true;
-    requestAnimationFrame(() => {
+    setTimeout(() => {
       scheduled = false;
       report();
-    });
+    }, 300);
+  }
+
+  // Sekme seçimi uygulamada dokunuşla değişir; geçiş olmazsa doğru sekme yeniden bildirilsin.
+  function resync() {
+    lastMessage = '';
+    scheduleReport();
   }
 
   // Sayfa içi geçiş: önce Instagram'ın kendi bağlantısı, yoksa yönlendiricisinin dinlediği popstate.
@@ -105,17 +126,18 @@
   function open(tab) {
     const path = { home: '/', search: '/explore/search/', messages: '/direct/inbox/' }[tab]
       || (tab === 'profile' && account && account.profile);
-    if (!path) return;
-    if (location.pathname === path) {
+    if (path && location.pathname === path) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
+    } else if (path) {
       go(path);
     }
+    resync();
   }
 
   globalThis.__instaLiteTabs = { open };
 
-  window.addEventListener('instalite:navigate', scheduleReport);
+  // Sayfa geçişi hemen bildirilir (sekme çubuğu gecikmeden gizlensin/görünsün); DOM değişiklikleri seyrek.
+  window.addEventListener('instalite:navigate', report);
   document.addEventListener('DOMContentLoaded', () => {
     report();
     new MutationObserver(scheduleReport).observe(document.body, { childList: true, subtree: true });

@@ -1,6 +1,6 @@
 import XCTest
 
-/// Akışı gerçek parmak hareketiyle kaydırır; akıcılık ölçümünü Debug sürümündeki `debug.js` kaydeder,
+/// Akışı gerçek parmak hareketiyle kaydırır; akıcılık ölçümünü Debug sürümündeki `DebugBridge ölçüm betiği` kaydeder,
 /// sonuç `Tools/metrics.sh` ile okunur. Ortam: TEST_RUNNER_SWIPES (adet), TEST_RUNNER_NOINJECT=1
 /// (betik ve stil olmadan karşılaştırma için), TEST_RUNNER_NOLAUNCH=1 (açık uygulamayı yeniden başlatmadan).
 final class FeedScrollUITests: XCTestCase {

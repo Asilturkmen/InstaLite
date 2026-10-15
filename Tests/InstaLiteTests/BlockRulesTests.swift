@@ -30,6 +30,25 @@ final class BlockRulesTests: XCTestCase {
         }
     }
 
+    func testInstagramImages() throws {
+        let allowed = [
+            "https://scontent-ist1-1.cdninstagram.com/v/t51/123.jpg?x=1",
+            "https://instagram.fist1-1.fna.fbcdn.net/v/t51/123.jpg",
+        ]
+        let rejected = [
+            "http://scontent.cdninstagram.com/a.jpg",
+            "https://example.com/a.jpg",
+            "https://cdninstagram.com.evil.example/a.jpg",
+            "https://evilfbcdn.net/a.jpg",
+        ]
+        for string in allowed {
+            XCTAssertTrue(BlockRules.isInstagramImage(try XCTUnwrap(URL(string: string))), string)
+        }
+        for string in rejected {
+            XCTAssertFalse(BlockRules.isInstagramImage(try XCTUnwrap(URL(string: string))), string)
+        }
+    }
+
     func testExternalLinks() throws {
         for item in try loadCases().external {
             let url = try XCTUnwrap(URL(string: item.url))

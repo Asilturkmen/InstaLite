@@ -6,14 +6,8 @@ final class NativeTabBar: UITabBar, UITabBarDelegate {
     enum Tab: Int, CaseIterable {
         case home, search, messages, profile
 
-        var name: String {
-            switch self {
-            case .home: "home"
-            case .search: "search"
-            case .messages: "messages"
-            case .profile: "profile"
-            }
-        }
+        /// `tabs.js`'teki `open()`'a giden ad.
+        var name: String { String(describing: self) }
 
         fileprivate var item: UITabBarItem {
             let (title, image, selected) = switch self {
@@ -41,6 +35,7 @@ final class NativeTabBar: UITabBar, UITabBarDelegate {
 
     private let haptics = UISelectionFeedbackGenerator()
     private var avatarURL: URL?
+    private var avatar: UIImage?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -49,6 +44,10 @@ final class NativeTabBar: UITabBar, UITabBarDelegate {
         selectedItem = items?.first
         tintColor = .label
         unselectedItemTintColor = .label
+        // Seçili profil halkası sabit renkle çizilir; görünüm değişince yeniden çizilsin.
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (bar: NativeTabBar, _) in
+            bar.applyAvatar()
+        }
     }
 
     required init?(coder: NSCoder) {
@@ -90,15 +89,32 @@ final class NativeTabBar: UITabBar, UITabBarDelegate {
 
     /// Profil sekmesinde Instagram uygulamasındaki gibi profil fotoğrafı gösterilir.
     private func loadAvatar(_ url: URL?) {
+        avatar = nil
+        applyAvatar()
         guard let url else { return }
         URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
             guard let data, let image = UIImage(data: data) else { return }
             DispatchQueue.main.async {
-                guard let self, self.avatarURL == url, let item = self.items?[Tab.profile.rawValue] else { return }
-                item.image = Self.circle(image, ring: false)
-                item.selectedImage = Self.circle(image, ring: true)
+                guard let self, self.avatarURL == url else { return }
+                self.avatar = image
+                self.applyAvatar()
             }
         }.resume()
+    }
+
+    /// Fotoğraf yoksa (henüz yüklenmedi ya da oturum kapandı) varsayılan simgeye döner.
+    private func applyAvatar() {
+        guard let item = items?[Tab.profile.rawValue] else { return }
+        guard let avatar else {
+            let fallback = Tab.profile.item
+            item.image = fallback.image
+            item.selectedImage = fallback.selectedImage
+            return
+        }
+        traitCollection.performAsCurrent {
+            item.image = Self.circle(avatar, ring: false)
+            item.selectedImage = Self.circle(avatar, ring: true)
+        }
     }
 
     private static func circle(_ image: UIImage, ring: Bool) -> UIImage {

@@ -8,6 +8,16 @@ Analitik, sunucu ya da dış istek yok.
 > için yazılmış bir açık kaynak projesidir; App Store'da dağıtılmaz. Kullanırken Instagram'ın
 > kullanım koşulları geçerlidir.
 
+## Gizlilik ve güvenlik
+
+- Uygulamanın sunucusu, analitiği ya da üçüncü taraf kütüphanesi yok. Uygulamanın kendisi yalnız profil
+  fotoğrafını Instagram'ın resim sunucusundan indirir; oturum çerezleri bu istekle gitmez.
+- Instagram oturumu yalnız cihazda, uygulamanın kendi web deposunda tutulur.
+- instagram.com dışındaki bağlantılar Safari'de açılır. Başka uygulama açan adresler (App Store, `tel:` vb.)
+  yalnız kullanıcı dokunduğunda açılır.
+- Debug sürümü geliştirme köprüsü (`Web/DebugBridge.swift`) ve sayfa denetleyicisi içerir; günlük kullanım için
+  Release sürümünü kur: `Tools/run-device.sh Release`.
+
 ## Kurulum
 
 ```sh
@@ -32,7 +42,10 @@ iPhone'da Ayarlar → Gizlilik ve Güvenlik → Geliştirici Modu açık olmalı
 
 - `Web/BlockRules.swift`: gerçek sayfa yüklemeleri (`decidePolicyFor`) ve Safari'de açılacak dış bağlantılar.
 - `Resources/rules.js` + `blocker.js`: sayfa yeniden yüklenmeden yapılan geçişler (`history.pushState`).
-- `Resources/hide.css` + `page.js`: Reels düğmeleri, akıştaki Reels, "Uygulamada aç" bantları ve web ipuçları.
+- `Resources/feed-filter.js`: akıştaki Reels, Instagram'ın listesi görmeden veriden çıkarılır (CSS ile gizlemek
+  akışın sanal listesini bozar: sayfa başa sıçrar, takılır).
+- `Resources/hide.css` + `page.js`: Reels sekmeleri, "Uygulamada aç" bantları ve web ipuçları.
+- `Resources/tabs.js` + `Web/NativeTabBar.swift`: web alt çubuğunun yerine yerel sekme çubuğu.
 
 Engellenen: `/reels/`, `/<kullanıcı>/reels/`, Keşfet (`/explore/` aramaya yönlenir), bir Reel'den başka
 bir Reel'e geçiş. DM'den açılan tek Reel serbesttir.
@@ -46,6 +59,10 @@ xcodebuild test -scheme InstaLite \
 ```
 
 İki taraf da `Tests/rules-cases.json` vakalarını kullanır; bir kuralı değiştirirken ikisini birlikte değiştir.
+
+Geliştirme araçları (yalnız Debug sürümünde çalışır): `Tools/run-sim.sh` / `Tools/run-device.sh` derleyip kurar,
+`Tools/bridge.sh` açık uygulamanın sayfasında JS çalıştırır, `Tools/uitest.sh` telefonda akışı gerçek dokunuşla
+kaydırıp akıcılığı ölçer (`InstaLiteMetrics` şeması; açık Instagram oturumu ister).
 
 ## Lisans
 
